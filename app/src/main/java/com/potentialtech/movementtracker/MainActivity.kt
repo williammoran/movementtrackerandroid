@@ -18,7 +18,6 @@ const val TAG = "UI updater"
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var locationCallback: LocationCallback
     private lateinit var textView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +57,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("MissingPermission")
     private fun startLocationCollection() {
         textView = findViewById<TextView>(R.id.textPosition)
-        locationCallback = object : LocationCallback() {
+        val locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult ?: return
                 for (location in locationResult.locations){
