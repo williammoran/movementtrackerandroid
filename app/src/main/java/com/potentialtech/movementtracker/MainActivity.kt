@@ -3,19 +3,42 @@ package com.potentialtech.movementtracker
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import java.util.*
 
 const val REQUEST_CODE = 8
 const val TAG = "UI updater"
 
 class MainActivity : AppCompatActivity() {
 
+    private var gatherer = FusedGatherer(this)
+    private lateinit var recorder: FileReceiver
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initLocationCollection()
+    }
+
+    fun onClickStart(v: View) {
+        v.isEnabled = false
+        val context = this.applicationContext
+        val filename = "Track_" + Calendar.getInstance().time.time.toString() + ".csv"
+        recorder = FileReceiver(filename, context)
+        gatherer.registerReceiver(recorder)
+        findViewById<View>(R.id.button_stop_recording).isEnabled = true
+    }
+
+    fun onClickStop(v: View) {
+        v.isEnabled = false
+        val textView = findViewById<TextView>(R.id.textPosition)
+        val displayer = LocationDisplayer(this, textView)
+        gatherer.registerReceiver(displayer)
+        recorder.close()
+        findViewById<View>(R.id.button_start_recording).isEnabled = true
     }
 
     private fun initLocationCollection() {
@@ -49,7 +72,6 @@ class MainActivity : AppCompatActivity() {
     private fun startLocationCollection() {
         val textView = findViewById<TextView>(R.id.textPosition)
         val displayer = LocationDisplayer(this, textView)
-        val gatherer = FusedGatherer(this)
         gatherer.registerReceiver(displayer)
         gatherer.start()
     }
