@@ -10,16 +10,18 @@ import androidx.core.app.ActivityCompat
 import java.util.*
 
 const val REQUEST_CODE = 8
-const val TAG = "UI updater"
+const val LOG_TAG = "UI updater"
 
 class MainActivity : AppCompatActivity() {
 
     private var gatherer = FusedGatherer(this)
     private lateinit var recorder: FileReceiver
+    private lateinit var textAreaPosition: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        textAreaPosition = findViewById<TextView>(R.id.textPosition)
         initLocationCollection()
     }
 
@@ -34,8 +36,7 @@ class MainActivity : AppCompatActivity() {
 
     fun onClickStop(v: View) {
         v.isEnabled = false
-        val textView = findViewById<TextView>(R.id.textPosition)
-        val displayer = LocationDisplayer(this, textView)
+        val displayer = LocationDisplayer(this, textAreaPosition)
         gatherer.registerReceiver(displayer)
         recorder.close()
         findViewById<View>(R.id.button_start_recording).isEnabled = true
@@ -70,8 +71,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startLocationCollection() {
-        val textView = findViewById<TextView>(R.id.textPosition)
-        val displayer = LocationDisplayer(this, textView)
+        val displayer = LocationDisplayer(this, textAreaPosition)
         gatherer.registerReceiver(displayer)
         gatherer.start()
     }

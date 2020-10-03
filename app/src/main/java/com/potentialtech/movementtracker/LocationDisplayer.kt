@@ -15,7 +15,7 @@ class LocationDisplayer(activityIn: AppCompatActivity, tvIn: TextView): Location
         activity.runOnUiThread(object : Thread() {
             override fun run() {
                 if (lastLocation == null) {
-                    Log.d(TAG,"Null location")
+                    Log.d(LOG_TAG,"Null location")
                 } else {
                     val alt = lastLocation.altitude
                     val lat = lastLocation.latitude
