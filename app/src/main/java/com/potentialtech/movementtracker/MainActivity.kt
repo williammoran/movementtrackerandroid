@@ -1,6 +1,7 @@
 package com.potentialtech.movementtracker
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
@@ -10,12 +11,10 @@ import androidx.core.app.ActivityCompat
 import java.util.*
 
 const val REQUEST_CODE = 8
-const val LOG_TAG = "UI updater"
+const val TRACK_FILENAME = "com.potentialtech.movementtracker::TRACK_FILENAME"
 
 class MainActivity : AppCompatActivity() {
 
-    private var gatherer = FusedGatherer(this)
-    private lateinit var recorder: FileReceiver
     private lateinit var textAreaPosition: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,18 +26,17 @@ class MainActivity : AppCompatActivity() {
 
     fun onClickStart(v: View) {
         v.isEnabled = false
-        val context = this.applicationContext
         val filename = "Track_" + Calendar.getInstance().time.time.toString() + ".csv"
-        recorder = FileReceiver(filename, context)
-        gatherer.registerReceiver(recorder)
+        val recordIntent = Intent(this, GpsService::class.java)
+        recordIntent.putExtra(TRACK_FILENAME, filename)
+        startService(recordIntent)
         findViewById<View>(R.id.button_stop_recording).isEnabled = true
     }
 
     fun onClickStop(v: View) {
         v.isEnabled = false
-        val displayer = LocationDisplayer(this, textAreaPosition)
-        gatherer.registerReceiver(displayer)
-        recorder.close()
+        val stopRecordIntent = Intent(this, GpsService::class.java)
+        stopService(stopRecordIntent)
         findViewById<View>(R.id.button_start_recording).isEnabled = true
     }
 
@@ -72,7 +70,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun startLocationCollection() {
         val displayer = LocationDisplayer(this, textAreaPosition)
-        gatherer.registerReceiver(displayer)
-        gatherer.start()
+        val fusedGatherer = FusedGatherer(this, displayer)
+        fusedGatherer.start()
     }
 }

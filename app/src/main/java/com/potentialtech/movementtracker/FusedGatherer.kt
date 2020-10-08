@@ -6,29 +6,25 @@ import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.*
 
-class FusedGatherer(activityIn: AppCompatActivity): LocationGatherer {
+class FusedGatherer(activityIn: AppCompatActivity, rec: LocationListener) {
 
-    private lateinit var receiver: LocationReceiver
+    private var receiver: LocationListener  = rec
     private var activity: AppCompatActivity = activityIn
 
-    override fun registerReceiver(r: LocationReceiver) {
-        this.receiver = r
-    }
-
     @SuppressLint("MissingPermission")
-    override fun start() {
+    fun start() {
         val locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult ?: return
                 for (location in locationResult.locations){
-                    receiver.receive(location)
+                    receiver.onLocationChanged(location)
                 }
             }
         }
         // Seed things with the last known location
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity)
         fusedLocationClient.lastLocation.addOnSuccessListener {
-                lastLocation: Location? -> if (lastLocation != null) receiver.receive(lastLocation)
+                lastLocation: Location? -> if (lastLocation != null) receiver.onLocationChanged(lastLocation)
         }
         val locationRequest = LocationRequest.create()
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY

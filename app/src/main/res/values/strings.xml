@@ -2,4 +2,7 @@
     <string name="app_name">Movement Tracker</string>
     <string name="button_start_recording">Start Recording</string>
     <string name="button_stop_recording">Stop Recording</string>
+    <string name="recording_title">Recording GPS track</string>
+    <string name="recording_message">Your travels are being recorded</string>
+    <string name="recording_channel_name">GPS Recording</string>
 </resources>
